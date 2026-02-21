@@ -13,22 +13,15 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'Gamified Social Support Intervention | CVR Study',
-  description: 'A gamified social support intervention for cardiovascular risk reduction. Track steps, earn badges, and support each other toward better heart health.',
+  title: 'Gamified Physical Activity & Social Support Intervention | CVD Study',
+  description: 'A gamified physical activity and social support intervention for cardiovascular risk reduction. Track steps, earn badges, and support each other toward better heart health.',
   icons: {
     icon: [
       {
-        url: '/icon-light-32x32.png',
+        url: '/favicon.co',
         media: '(prefers-color-scheme: light)',
       },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
+      
     ],
     apple: '/apple-icon.png',
   },
