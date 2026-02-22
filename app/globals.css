@@ -4,39 +4,46 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.17 0.02 230);
-  --foreground: oklch(0.97 0.005 210);
-  --card: oklch(0.22 0.025 220 / 0.6);
-  --card-foreground: oklch(0.97 0.005 210);
-  --popover: oklch(0.2 0.02 225);
-  --popover-foreground: oklch(0.97 0.005 210);
-  --primary: oklch(0.7 0.15 195);
-  --primary-foreground: oklch(0.13 0.02 220);
-  --secondary: oklch(0.28 0.03 225);
-  --secondary-foreground: oklch(0.92 0.01 210);
-  --muted: oklch(0.25 0.025 225);
-  --muted-foreground: oklch(0.65 0.03 210);
-  --accent: oklch(0.65 0.18 175);
-  --accent-foreground: oklch(0.13 0.02 220);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.97 0.005 210);
-  --border: oklch(0.35 0.04 220 / 0.5);
-  --input: oklch(0.3 0.03 225 / 0.6);
-  --ring: oklch(0.7 0.15 195);
-  --chart-1: oklch(0.7 0.15 195);
-  --chart-2: oklch(0.65 0.18 175);
-  --chart-3: oklch(0.6 0.12 250);
-  --chart-4: oklch(0.75 0.12 185);
-  --chart-5: oklch(0.55 0.15 210);
+  --background: #0F172A;
+  --foreground: #F1F5F9;
+  --card: rgba(15, 23, 42, 0.55);
+  --card-foreground: #F1F5F9;
+  --popover: #0F172A;
+  --popover-foreground: #F1F5F9;
+  --primary: #0EA5A4;
+  --primary-foreground: #0F172A;
+  --secondary: rgba(30, 41, 59, 0.7);
+  --secondary-foreground: #CBD5E1;
+  --muted: #1E293B;
+  --muted-foreground: #94A3B8;
+  --accent: #06B6D4;
+  --accent-foreground: #0F172A;
+  --destructive: #EF4444;
+  --destructive-foreground: #F1F5F9;
+  --border: rgba(51, 65, 85, 0.5);
+  --input: rgba(30, 41, 59, 0.6);
+  --ring: #0EA5A4;
+  --chart-1: #0EA5A4;
+  --chart-2: #06B6D4;
+  --chart-3: #8B5CF6;
+  --chart-4: #10B981;
+  --chart-5: #F97316;
   --radius: 1rem;
-  --sidebar: oklch(0.15 0.02 230);
-  --sidebar-foreground: oklch(0.97 0.005 210);
-  --sidebar-primary: oklch(0.7 0.15 195);
-  --sidebar-primary-foreground: oklch(0.13 0.02 220);
-  --sidebar-accent: oklch(0.28 0.03 225);
-  --sidebar-accent-foreground: oklch(0.97 0.005 210);
-  --sidebar-border: oklch(0.35 0.04 220 / 0.5);
-  --sidebar-ring: oklch(0.7 0.15 195);
+  --sidebar: #0B1120;
+  --sidebar-foreground: #F1F5F9;
+  --sidebar-primary: #0EA5A4;
+  --sidebar-primary-foreground: #0F172A;
+  --sidebar-accent: #1E293B;
+  --sidebar-accent-foreground: #F1F5F9;
+  --sidebar-border: rgba(51, 65, 85, 0.5);
+  --sidebar-ring: #0EA5A4;
+
+  /* Achievement Spectrum - only on earned states */
+  --energy-orange: #F97316;
+  --luxe-gold: #FACC15;
+  --electric-purple: #8B5CF6;
+  --emerald-success: #10B981;
+  --accent-pink: #EC4899;
 }
 
 @theme inline {
@@ -90,13 +97,118 @@
   }
 }
 
+/* --- Premium glass card with layered shadows --- */
 .glass-card {
-  background: oklch(0.22 0.025 220 / 0.45);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid oklch(0.5 0.08 200 / 0.2);
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid rgba(148, 163, 184, 0.08);
+  box-shadow:
+    0 0 0 1px rgba(148, 163, 184, 0.04),
+    0 4px 24px -4px rgba(0, 0, 0, 0.35),
+    0 12px 48px -8px rgba(0, 0, 0, 0.25);
 }
 
+/* --- Gradient background with mesh effect --- */
 .gradient-bg {
-  background: linear-gradient(135deg, oklch(0.15 0.04 240) 0%, oklch(0.18 0.05 200) 50%, oklch(0.16 0.04 180) 100%);
+  background: #0F172A;
+  position: relative;
+  overflow: hidden;
 }
+.gradient-bg::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(14, 165, 164, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 90%, rgba(6, 182, 212, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 50% 50%, rgba(139, 92, 246, 0.03) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+  animation: meshDrift 30s ease-in-out infinite alternate;
+}
+.gradient-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes meshDrift {
+  0% { transform: scale(1) translate(0, 0); }
+  33% { transform: scale(1.05) translate(-1%, 1%); }
+  66% { transform: scale(1.02) translate(1%, -0.5%); }
+  100% { transform: scale(1) translate(0, 0); }
+}
+
+/* --- Badge shimmer sweep --- */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.badge-shimmer {
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 6s ease-in-out infinite;
+}
+
+/* --- Ambient glow behind cards --- */
+.ambient-glow {
+  position: relative;
+}
+.ambient-glow::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: radial-gradient(ellipse at 50% 0%, rgba(14, 165, 164, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* --- Goal achieved radial burst --- */
+.goal-burst {
+  position: relative;
+}
+.goal-burst::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* --- Gold glow for rank 1 --- */
+.gold-glow {
+  box-shadow: 0 0 20px -4px rgba(250, 204, 21, 0.2), 0 0 8px -2px rgba(250, 204, 21, 0.1);
+  border: 1px solid rgba(250, 204, 21, 0.15);
+}
+
+/* --- Floating particles --- */
+@keyframes floatUp {
+  0% { transform: translateY(100vh) scale(0); opacity: 0; }
+  10% { opacity: 0.3; }
+  90% { opacity: 0.15; }
+  100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+}
+
+.particle {
+  position: fixed;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(14, 165, 164, 0.25);
+  pointer-events: none;
+  animation: floatUp linear infinite;
+  z-index: 0;
+}
+.particle:nth-child(1) { left: 10%; animation-duration: 28s; animation-delay: 0s; }
+.particle:nth-child(2) { left: 25%; animation-duration: 32s; animation-delay: 4s; width: 2px; height: 2px; }
+.particle:nth-child(3) { left: 45%; animation-duration: 26s; animation-delay: 8s; }
+.particle:nth-child(4) { left: 65%; animation-duration: 34s; animation-delay: 2s; width: 2px; height: 2px; background: rgba(6, 182, 212, 0.2); }
+.particle:nth-child(5) { left: 80%; animation-duration: 30s; animation-delay: 6s; }
+.particle:nth-child(6) { left: 92%; animation-duration: 27s; animation-delay: 10s; width: 2px; height: 2px; }

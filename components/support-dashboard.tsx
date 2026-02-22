@@ -1,13 +1,22 @@
 "use client"
 
 import { useState } from "react"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import {
   User, getUsers, getWeeklySteps, getWeeklyTotal,
   getStreak, getPoints, sendMessage, getLevel,
 } from "@/lib/store"
 import { StepChart } from "@/components/step-chart"
-import { Users, Send, Flame, Star, Target, BarChart3 } from "lucide-react"
+import { Users, Send, Flame, Star, Target, BarChart3, CheckCircle } from "lucide-react"
+
+const card = {
+  initial: { opacity: 0, y: 20 },
+  animate: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+  }),
+}
 
 interface SupportDashboardProps {
   user: User
@@ -32,151 +41,173 @@ export function SupportDashboard({ user }: SupportDashboardProps) {
     sendMessage(user.alias, selectedAlias, message.trim())
     setMessage("")
     setSent(true)
-    setTimeout(() => setSent(false), 2000)
+    setTimeout(() => setSent(false), 2500)
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-bold text-foreground mb-1 flex items-center gap-2">
-          <Users className="h-5 w-5 text-primary" />
-          Support Dashboard
-        </h2>
-        <p className="text-sm text-muted-foreground">View and encourage participants</p>
-      </div>
+    <div className="space-y-5">
+      <motion.div custom={0} variants={card} initial="initial" animate="animate">
+        <div className="flex items-center gap-2 mb-1">
+          <Users className="h-5 w-5" style={{ color: "#0EA5A4" }} />
+          <h2
+            className="font-[var(--font-montserrat)] text-lg font-bold tracking-wide"
+            style={{ color: "#F1F5F9" }}
+          >
+            Support Dashboard
+          </h2>
+        </div>
+        <p className="text-sm" style={{ color: "#64748B" }}>View and encourage participants</p>
+      </motion.div>
 
       {/* Participant Selector */}
-      <div className="glass-card rounded-2xl p-5">
-        <label className="block text-sm font-medium text-foreground mb-2">
+      <motion.div custom={1} variants={card} initial="initial" animate="animate" className="glass-card rounded-2xl p-5">
+        <label className="block text-xs font-medium uppercase tracking-wider mb-2.5" style={{ color: "#94A3B8" }}>
           Select Participant
         </label>
         {participants.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No participants registered yet.</p>
+          <p className="text-sm" style={{ color: "#94A3B8" }}>No participants registered yet.</p>
         ) : (
           <div className="flex flex-wrap gap-2">
-            {participants.map((p) => (
-              <button
-                key={p.alias}
-                onClick={() => setSelectedAlias(p.alias)}
-                className={`rounded-xl px-4 py-2 text-sm font-medium transition-all ${
-                  selectedAlias === p.alias
-                    ? "bg-primary/20 ring-2 ring-primary text-foreground"
-                    : "bg-secondary/50 text-secondary-foreground hover:bg-secondary"
-                }`}
-              >
-                {p.alias}
-                <span className="text-xs text-muted-foreground ml-1.5 capitalize">({p.group})</span>
-              </button>
-            ))}
+            {participants.map((p) => {
+              const isSelected = selectedAlias === p.alias
+              return (
+                <motion.button
+                  key={p.alias}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => setSelectedAlias(p.alias)}
+                  className="rounded-xl px-4 py-2 text-sm font-medium transition-all duration-300"
+                  style={{
+                    background: isSelected ? "rgba(14,165,164,0.12)" : "rgba(30,41,59,0.4)",
+                    color: isSelected ? "#F1F5F9" : "#94A3B8",
+                    border: isSelected ? "1px solid rgba(14,165,164,0.3)" : "1px solid transparent",
+                    boxShadow: isSelected ? "0 0 12px -4px rgba(14,165,164,0.15)" : "none",
+                  }}
+                >
+                  {p.alias}
+                  <span className="text-xs ml-1.5 capitalize" style={{ color: "#64748B" }}>({p.group})</span>
+                </motion.button>
+              )
+            })}
           </div>
         )}
-      </div>
+      </motion.div>
 
-      {selected && (
-        <motion.div
-          key={selectedAlias}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-4"
-        >
-          {/* Stats */}
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <div className="glass-card rounded-2xl p-4">
-              <div className="flex items-center gap-2 text-muted-foreground mb-1">
-                <BarChart3 className="h-4 w-4" />
-                <span className="text-xs">Weekly</span>
-              </div>
-              <p className="text-xl font-bold text-foreground">{weeklyTotal.toLocaleString()}</p>
+      <AnimatePresence mode="wait">
+        {selected && (
+          <motion.div
+            key={selectedAlias}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="space-y-4"
+          >
+            {/* Stats */}
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+              {[
+                { icon: <BarChart3 className="h-4 w-4" />, label: "Weekly", val: weeklyTotal.toLocaleString() },
+                { icon: <Flame className="h-4 w-4" />, label: "Streak", val: `${streak}d` },
+                { icon: <Star className="h-4 w-4" />, label: "Points", val: `${points}` },
+                { icon: <Target className="h-4 w-4" />, label: "Level", val: level.name },
+              ].map((stat) => (
+                <div key={stat.label} className="glass-card rounded-2xl p-4">
+                  <div className="flex items-center gap-2 mb-1" style={{ color: "#94A3B8" }}>
+                    {stat.icon}
+                    <span className="text-xs">{stat.label}</span>
+                  </div>
+                  <p className="font-[var(--font-montserrat)] text-xl font-light" style={{ color: "#F1F5F9" }}>{stat.val}</p>
+                </div>
+              ))}
             </div>
-            <div className="glass-card rounded-2xl p-4">
-              <div className="flex items-center gap-2 text-muted-foreground mb-1">
-                <Flame className="h-4 w-4" />
-                <span className="text-xs">Streak</span>
-              </div>
-              <p className="text-xl font-bold text-foreground">{streak}d</p>
-            </div>
-            <div className="glass-card rounded-2xl p-4">
-              <div className="flex items-center gap-2 text-muted-foreground mb-1">
-                <Star className="h-4 w-4" />
-                <span className="text-xs">Points</span>
-              </div>
-              <p className="text-xl font-bold text-foreground">{points}</p>
-            </div>
-            <div className="glass-card rounded-2xl p-4">
-              <div className="flex items-center gap-2 text-muted-foreground mb-1">
-                <Target className="h-4 w-4" />
-                <span className="text-xs">Level</span>
-              </div>
-              <p className="text-xl font-bold text-foreground">{level.name}</p>
-            </div>
-          </div>
 
-          {/* Weekly Chart */}
-          <div className="glass-card rounded-2xl p-5">
-            <h3 className="text-sm font-medium text-foreground mb-3">
-              {"Weekly Steps for "}{selectedAlias}
-            </h3>
-            <StepChart data={weeklyData} animate={true} />
-          </div>
-
-          {/* Shared Challenge */}
-          <div className="glass-card rounded-2xl p-5 border border-primary/30">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-                <Target className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-foreground">Shared Weekly Challenge</h3>
-                <p className="text-xs text-muted-foreground">Help {selectedAlias} reach 35,000 steps</p>
-              </div>
+            {/* Weekly Chart */}
+            <div className="glass-card rounded-2xl p-5">
+              <h3 className="text-xs font-medium mb-3" style={{ color: "#CBD5E1" }}>
+                {"Weekly Steps for "}{selectedAlias}
+              </h3>
+              <StepChart data={weeklyData} animate={true} />
             </div>
-            <div className="mt-3 h-2 rounded-full bg-secondary overflow-hidden">
-              <motion.div
-                className="h-full rounded-full bg-gradient-to-r from-primary to-accent"
-                initial={{ width: 0 }}
-                animate={{ width: `${Math.min((weeklyTotal / 35000) * 100, 100)}%` }}
-                transition={{ duration: 1, ease: "easeOut" }}
-              />
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {Math.round((weeklyTotal / 35000) * 100)}% complete
-            </p>
-          </div>
 
-          {/* Send Message */}
-          <div className="glass-card rounded-2xl p-5">
-            <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
-              <Send className="h-4 w-4 text-primary" />
-              Send Encouragement
-            </h3>
-            <form onSubmit={handleSendMessage} className="flex gap-2">
-              <input
-                type="text"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Write an encouraging message..."
-                className="flex-1 rounded-xl bg-input px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
-              />
-              <button
-                type="submit"
-                className="rounded-xl bg-primary px-5 py-2.5 text-primary-foreground font-medium hover:opacity-90 transition-opacity flex items-center gap-1.5"
-              >
-                <Send className="h-4 w-4" />
-                Send
-              </button>
-            </form>
-            {sent && (
-              <motion.p
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-xs text-accent mt-2"
-              >
-                Message sent!
-              </motion.p>
-            )}
-          </div>
-        </motion.div>
-      )}
+            {/* Shared Challenge */}
+            <div
+              className="glass-card rounded-2xl p-5"
+              style={{ border: "1px solid rgba(14,165,164,0.15)" }}
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center"
+                  style={{ background: "linear-gradient(135deg, rgba(14,165,164,0.15) 0%, rgba(6,182,212,0.1) 100%)" }}
+                >
+                  <Target className="h-5 w-5" style={{ color: "#0EA5A4" }} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold" style={{ color: "#F1F5F9" }}>Shared Weekly Challenge</h3>
+                  <p className="text-xs" style={{ color: "#64748B" }}>Help {selectedAlias} reach 35,000 steps</p>
+                </div>
+              </div>
+              <div className="h-2 rounded-full overflow-hidden" style={{ background: "rgba(30,41,59,0.6)" }}>
+                <motion.div
+                  className="h-full rounded-full"
+                  style={{ background: "linear-gradient(90deg, #0EA5A4, #06B6D4)" }}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${Math.min((weeklyTotal / 35000) * 100, 100)}%` }}
+                  transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                />
+              </div>
+              <p className="text-xs mt-1.5" style={{ color: "#64748B" }}>
+                {Math.round((weeklyTotal / 35000) * 100)}% complete
+              </p>
+            </div>
+
+            {/* Send Message */}
+            <div className="glass-card rounded-2xl p-5">
+              <h3 className="text-xs font-medium mb-3 flex items-center gap-2" style={{ color: "#CBD5E1" }}>
+                <Send className="h-4 w-4" style={{ color: "#0EA5A4" }} />
+                Send Encouragement
+              </h3>
+              <form onSubmit={handleSendMessage} className="flex gap-2">
+                <input
+                  type="text"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Write an encouraging message..."
+                  className="flex-1 rounded-xl px-4 py-2.5 text-sm transition-all duration-300 focus:outline-none"
+                  style={{ background: "rgba(30,41,59,0.6)", color: "#F1F5F9" }}
+                  onFocus={(e) => e.currentTarget.style.boxShadow = "0 0 0 2px #0EA5A4"}
+                  onBlur={(e) => e.currentTarget.style.boxShadow = "none"}
+                />
+                <motion.button
+                  type="submit"
+                  whileTap={{ scale: 0.97 }}
+                  className="rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-300 flex items-center gap-1.5"
+                  style={{
+                    background: "linear-gradient(135deg, #0EA5A4 0%, #06B6D4 100%)",
+                    color: "#0F172A",
+                  }}
+                >
+                  <Send className="h-4 w-4" />
+                  Send
+                </motion.button>
+              </form>
+              <AnimatePresence>
+                {sent && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="text-xs mt-2 flex items-center gap-1"
+                    style={{ color: "#10B981" }}
+                  >
+                    <CheckCircle className="h-3 w-3" />
+                    Message sent successfully
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

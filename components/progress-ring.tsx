@@ -3,49 +3,78 @@
 import { motion } from "framer-motion"
 
 interface ProgressRingProps {
-  progress: number // 0-100
+  progress: number
   size?: number
   strokeWidth?: number
   label?: string
   value?: string
+  goalReached?: boolean
 }
 
-export function ProgressRing({ progress, size = 120, strokeWidth = 8, label, value }: ProgressRingProps) {
+export function ProgressRing({ progress, size = 120, strokeWidth = 8, label, value, goalReached = false }: ProgressRingProps) {
   const radius = (size - strokeWidth) / 2
   const circumference = radius * 2 * Math.PI
   const offset = circumference - (Math.min(progress, 100) / 100) * circumference
 
+  const strokeColor = goalReached ? "url(#emeraldGrad)" : "url(#tealGrad)"
+
   return (
     <div className="flex flex-col items-center gap-2">
       <div className="relative" style={{ width: size, height: size }}>
-        <svg width={size} height={size} className="-rotate-90">
+        {/* Ambient glow behind ring */}
+        <div
+          className="absolute inset-0 rounded-full blur-xl opacity-30"
+          style={{
+            background: goalReached
+              ? "radial-gradient(circle, #10B981 0%, transparent 70%)"
+              : "radial-gradient(circle, #0EA5A4 0%, transparent 70%)",
+          }}
+        />
+        <svg width={size} height={size} className="-rotate-90 relative">
+          <defs>
+            <linearGradient id="tealGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#0EA5A4" />
+              <stop offset="100%" stopColor="#06B6D4" />
+            </linearGradient>
+            <linearGradient id="emeraldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#10B981" />
+              <stop offset="100%" stopColor="#06B6D4" />
+            </linearGradient>
+          </defs>
+          {/* Track */}
           <circle
             cx={size / 2}
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke="oklch(0.28 0.03 225)"
+            stroke="rgba(30, 41, 59, 0.6)"
             strokeWidth={strokeWidth}
           />
+          {/* Progress */}
           <motion.circle
             cx={size / 2}
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke="oklch(0.7 0.15 195)"
+            stroke={strokeColor}
             strokeWidth={strokeWidth}
             strokeDasharray={circumference}
             strokeDashoffset={circumference}
             animate={{ strokeDashoffset: offset }}
-            transition={{ duration: 1.5, ease: "easeOut" }}
+            transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
             strokeLinecap="round"
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-xl font-bold text-foreground">{value || `${Math.round(progress)}%`}</span>
+          <span
+            className="font-[var(--font-montserrat)] text-xl font-light tracking-tight"
+            style={{ color: "#F1F5F9" }}
+          >
+            {value || `${Math.round(progress)}%`}
+          </span>
         </div>
       </div>
-      {label && <span className="text-xs text-muted-foreground font-medium">{label}</span>}
+      {label && <span className="text-xs text-[#94A3B8] font-medium">{label}</span>}
     </div>
   )
 }

@@ -16,15 +16,9 @@ export const metadata: Metadata = {
   title: 'Gamified Physical Activity & Social Support Intervention | CVD Study',
   description: 'A gamified physical activity and social support intervention for cardiovascular risk reduction. Track steps, earn badges, and support each other toward better heart health.',
   icons: {
-    icon: [
-      {
-        url: '/favicon.co',
-        media: '(prefers-color-scheme: light)',
-      },
-      
-    ],
+    icon: '/favicon.ico',
     apple: '/apple-icon.png',
-  },
+  }
 }
 
 export default function RootLayout({
